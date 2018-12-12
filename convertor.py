@@ -15,10 +15,10 @@ def m_to_km(distance) :
     return distance / 1000
 
 def h_to_s(time) :
-    """Converts h to s"""
+    """Converts hours to seconds"""
     return time / 3600
 
 def s_to_h(time) :
-    """Converts s to h"""
+    """Converts seconds to hours"""
     return time * 3600
 
