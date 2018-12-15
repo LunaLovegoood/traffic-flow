@@ -76,3 +76,7 @@ def find_first_unexistent_vehicle(starting_positions) :
             break
     return vehicle_index
 
+def generate_tabled_density_values(max_density) :
+    step = 0.001
+    return np.arange(0, max_density + step, step)
+

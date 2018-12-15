@@ -111,4 +111,3 @@ def calculate_mean_flow_rate(flow_rates) :
     mean_flow_rate /= flow_rates.size
     return mean_flow_rate
 
-
