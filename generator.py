@@ -6,10 +6,12 @@ def generate_time_stamps(number_of_time_stamps, time_step) :
     time_stamps = np.arange(0, number_of_time_stamps * time_step, time_step)
     return time_stamps
 
-def generate_distances(number_of_vehicles, number_of_lanes, vehicle_length, 
-                       road_interval, time_stamps, 
-                       mean_speed, speed_deviation,
-                       spacing, spacing_scatter) :
+def generate_distances(
+    number_of_vehicles, number_of_lanes, vehicle_length, 
+    road_interval, time_stamps, 
+    mean_speed, speed_deviation,
+    spacing, spacing_scatter) :
+    
     number_of_time_stamps = time_stamps.size
     time_step = time_stamps[1] - time_stamps[0]
     mean_speed *= time_step
@@ -33,13 +35,13 @@ def generate_distances(number_of_vehicles, number_of_lanes, vehicle_length,
             distances[j][i] = np.random.normal(mean_speed, speed_deviation)
             if distances[j][i] < 0 :
                 distances[j][i] = 0
-            if positions[j] + distances[j][i] <= road_interval :
+            if (positions[j] + distances[j][i]) <= road_interval :
                 positions[j] += distances[j][i]
             else :
                 distances[j][i] = road_interval - positions[j]
                 positions[j] = road_interval
 
-    return distances
+    return [distances, positions]
 
 def generate_starting_positions(number_of_vehicles, road_interval, number_of_lanes, 
                                 spacing, spacing_scatter) :
