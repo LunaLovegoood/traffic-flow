@@ -90,4 +90,25 @@ def calculate_mean_density(densities) :
     mean_density /= densities.size
     return mean_density
 
+#
+# Flow rate functions
+#
+
+def calculate_flow_rates(mean_velocities, densities) :
+    flow_rates = np.zeros(densities.size)
+
+    for i in range(0, flow_rates.size) :
+        flow_rates[i] = densities[i] * mean_velocities[i]
+
+    return flow_rates
+
+def calculate_mean_flow_rate(flow_rates) :
+    mean_flow_rate = 0
+
+    for i in range(0, flow_rates.size) :
+        mean_flow_rate += flow_rates[i]
+
+    mean_flow_rate /= flow_rates.size
+    return mean_flow_rate
+
 
