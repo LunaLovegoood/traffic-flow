@@ -1,5 +1,9 @@
 import numpy as np
 
+#
+# Velocity functions
+#
+
 def calculate_velocities(vehicle_distances, time_step) :
     rows, cols = vehicle_distances.shape
     velocities = np.zeros((rows, cols))
@@ -32,7 +36,8 @@ def calculate_mean_velocities(velocities) :
             if velocities[i][j] != 0 :
                 mean_velocities[i] += velocities[i][j]
                 number_of_non_zero_velocities += 1
-        mean_velocities[i] /= number_of_non_zero_velocities
+        if number_of_non_zero_velocities != 0 :
+            mean_velocities[i] /= number_of_non_zero_velocities
         number_of_non_zero_velocities = 0
 
     return mean_velocities
@@ -45,3 +50,44 @@ def calculate_mean_velocity(mean_velocities) :
     mean_velocity /= mean_velocities.size
 
     return mean_velocity
+
+#
+# Density functions
+#
+
+def max_density(number_of_lanes, vehicle_length) :
+    return number_of_lanes / vehicle_length
+
+def density(vehicle_distances, t, total_length, vehicle_length) :
+    density_value = 0
+    space_occupied_by_vehicles = 0
+
+    for i in range(0, vehicle_distances.shape[0]) :
+        if vehicle_distances[i][t] != 0 :
+            space_occupied_by_vehicles += vehicle_length + 0.4
+
+    density_value = space_occupied_by_vehicles / total_length
+    return density_value
+
+def calculate_total_length(road_interval, number_of_lanes) :
+    return road_interval * number_of_lanes
+
+def calculate_densities(vehicle_distances, road_interval, number_of_lanes, vehicle_length) :
+    densities = np.zeros(vehicle_distances.shape[1])
+    total_length = calculate_total_length(road_interval, number_of_lanes)
+
+    for i in range(0, densities.size) :
+        densities[i] = density(vehicle_distances, i, total_length, vehicle_length)
+
+    return densities
+
+def calculate_mean_density(densities) :
+    mean_density = 0
+
+    for i in range(0, densities.size) :
+        mean_density += densities[i]
+
+    mean_density /= densities.size
+    return mean_density
+
+
