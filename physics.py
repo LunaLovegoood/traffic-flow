@@ -7,15 +7,15 @@ import numpy as np
 def calculate_velocities(vehicle_distances, time_step) :
   rows, cols = vehicle_distances.shape
   velocities = np.zeros((rows, cols))
-  number_of_non_zero_velocities = 0
+  number_of_vehicles = 0
 
   for i in range(0, rows) :
     for j in range(0, cols) :
       if vehicle_distances[i][j] != 0 :
         velocities[i][j] = vehicle_distances[i][j] / time_step
-        number_of_non_zero_velocities += 1
+        number_of_vehicles += 1
 
-  plane_velocities = np.zeros(number_of_non_zero_velocities)
+  plane_velocities = np.zeros(number_of_vehicles)
   index = 0
 
   for i in range(0, rows) :
@@ -29,30 +29,30 @@ def calculate_velocities(vehicle_distances, time_step) :
 def calculate_mean_velocities(velocities) :
   rows, cols = velocities.shape
   mean_velocities = np.zeros(cols)
-  number_of_non_zero_velocities = 0
+  number_of_vehicles = 0
 
   for j in range(0, cols) :
     for i in range(0, rows) :
       if velocities[i][j] != 0 :
         mean_velocities[j] += velocities[i][j]
-        number_of_non_zero_velocities += 1
-    if number_of_non_zero_velocities != 0 :
-      mean_velocities[j] /= number_of_non_zero_velocities
-    number_of_non_zero_velocities = 0
+        number_of_vehicles += 1
+    if number_of_vehicles != 0 :
+      mean_velocities[j] /= number_of_vehicles
+    number_of_vehicles = 0
 
   return mean_velocities
 
 def calculate_mean_velocity(mean_velocities) :
   mean_velocity = 0
-  number_of_non_zero_velocities = 0
+  number_of_vehicles = 0
 
   for i in range(0, mean_velocities.size) :
     if mean_velocities[i] != 0 :
       mean_velocity += mean_velocities[i]
-      number_of_non_zero_velocities += 1
+      number_of_vehicles += 1
 
-  if number_of_non_zero_velocities != 0 :
-    mean_velocity /= number_of_non_zero_velocities
+  if number_of_vehicles != 0 :
+    mean_velocity /= number_of_vehicles
 
   return mean_velocity
 
@@ -65,12 +65,45 @@ def max_density(number_of_lanes, vehicle_length) :
 
 def calculate_densities(vehicle_distances, road_interval, number_of_lanes, vehicle_length, 
     starting_positions, unit_length) :
-  densities = np.zeros(vehicle_distances.shape)
-  total_length = road_interval * number_of_lanes
+  densities = np.zeros((int(road_interval/unit_length), vehicle_distances.shape[1]))
+  total_length_of_unit_length = unit_length * number_of_lanes
 
+  positions = starting_positions
+  current_position = 0
 
+  for time_moment in range(0, densities.shape[1]) :
+    for interval_index in range(0, densities.shape[0]) :
+      densities[interval_index][time_moment] = number_of_vehicles_in_the_interval(
+          positions,
+          current_position, current_position + unit_length)
+      if densities[interval_index][time_moment] != 0 :
+        densities[interval_index][time_moment] = (densities[interval_index][time_moment]*vehicle_length) / total_length_of_unit_length
+      positions = update_positions(positions, vehicle_distances, time_moment)
+      current_position += unit_length
+    positions = starting_positions
+    current_position = 0
 
   return densities
+
+def number_of_vehicles_in_the_interval(positions, lower_bound, upper_bound) :
+  number_of_vehicles = 0
+
+  for i in range(0, positions.size) :
+    if is_inside_interval(positions[i], lower_bound, upper_bound) :
+      number_of_vehicles += 1
+
+  return number_of_vehicles
+
+def is_inside_interval(value, lower_bound, upper_bound) :
+  return (value >= lower_bound and value <upper_bound)
+
+def update_positions(positions, vehicle_distances, time_moment) :
+  updated_positions = positions
+
+  for i in range(0, updated_positions.size) :
+    updated_positions[i] = positions[i] + vehicle_distances[i][time_moment]
+
+  return updated_positions
 
 def calculate_mean_density(densities) :
   mean_density = 0
