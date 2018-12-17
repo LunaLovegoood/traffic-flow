@@ -6,6 +6,7 @@ import physics as phys
 number_of_vehicles = 500
 number_of_lanes = 2
 road_interval = conv.km_to_m(2.5) #(km/h)
+unit_length = 25
 vehicle_length = 2.0 #(m)
 max_number_of_vehicles = (road_interval*number_of_lanes) / vehicle_length
 average_number_of_vehicles = max_number_of_vehicles * 0.5
