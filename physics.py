@@ -68,7 +68,7 @@ def calculate_densities(vehicle_distances, road_interval, number_of_lanes, vehic
   densities = np.zeros((int(road_interval/unit_length), vehicle_distances.shape[1]))
   total_length_of_unit_length = unit_length * number_of_lanes
 
-  positions = starting_positions
+  positions = np.copy(starting_positions)
   current_position = 0
 
   for time_moment in range(0, densities.shape[1]) :
@@ -80,7 +80,7 @@ def calculate_densities(vehicle_distances, road_interval, number_of_lanes, vehic
         densities[interval_index][time_moment] = (densities[interval_index][time_moment]*vehicle_length) / total_length_of_unit_length
       positions = update_positions(positions, vehicle_distances, time_moment)
       current_position += unit_length
-    positions = starting_positions
+    positions = np.copy(starting_positions)
     current_position = 0
 
   return densities
@@ -91,11 +91,11 @@ def number_of_vehicles_in_the_interval(positions, lower_bound, upper_bound) :
   for i in range(0, positions.size) :
     if is_inside_interval(positions[i], lower_bound, upper_bound) :
       number_of_vehicles += 1
-
+  
   return number_of_vehicles
 
 def is_inside_interval(value, lower_bound, upper_bound) :
-  return (value >= lower_bound and value <upper_bound)
+  return (value >= lower_bound and value < upper_bound)
 
 def update_positions(positions, vehicle_distances, time_moment) :
   updated_positions = positions
@@ -105,13 +105,32 @@ def update_positions(positions, vehicle_distances, time_moment) :
 
   return updated_positions
 
-def calculate_mean_density(densities) :
+def calculate_mean_densities(densities) :
+  mean_densities = np.zeros(densities.shape[1])
+  number_of_non_zero_densities = 0
+
+  for time_moment in range(0, mean_densities.size) :
+    for interval_index in range(0, densities.shape[0]) :
+      if densities[interval_index][time_moment] != 0 :
+        mean_densities[time_moment] += densities[interval_index][time_moment]
+        number_of_non_zero_densities += 1
+    if number_of_non_zero_densities != 0 :
+      mean_densities[time_moment] /= number_of_non_zero_densities
+    number_of_non_zero_densities = 0
+
+  return mean_densities
+
+def calculate_mean_density(mean_densities) :
   mean_density = 0
+  number_of_non_zero_densities = 0
 
-  for i in range(0, densities.size) :
-    mean_density += densities[i]
+  for i in range(0, mean_densities.size) :
+    if mean_densities[i] != 0 :
+      mean_density += mean_densities[i]
+      number_of_non_zero_densities += 1
 
-  mean_density /= densities.size
+  if number_of_non_zero_densities != 0 :
+    mean_density /= number_of_non_zero_densities
   return mean_density
 
 #
@@ -119,20 +138,31 @@ def calculate_mean_density(densities) :
 #
 
 def calculate_flow_rates(mean_velocities, densities) :
-  flow_rates = np.zeros(densities.size)
+  flow_rates = np.zeros(densities.shape)
 
-  for i in range(0, flow_rates.size) :
-    flow_rates[i] = densities[i] * mean_velocities[i]
+  for time_moment in range(0, flow_rates.shape[1]) :
+    for interval_index in range(0, flow_rates.shape[0]) :
+      flow_rates[interval_index][time_moment] = densities[interval_index][time_moment] * mean_velocities[time_moment]
 
   return flow_rates
 
-def calculate_mean_flow_rate(flow_rates) :
+def calculate_mean_flow_rates(flow_rates) :
+  mean_flow_rates = np.zeros(flow_rates.shape[1])
+
+  for time_moment in range(0, flow_rates.shape[1]) :
+    for interval_index in range(0, flow_rates.shape[0]) :
+        mean_flow_rates[time_moment] += flow_rates[interval_index][time_moment]
+    mean_flow_rates[time_moment] /= mean_flow_rates.size
+
+  return mean_flow_rates
+
+def calculate_mean_flow_rate(mean_flow_rates) :
   mean_flow_rate = 0
 
-  for i in range(0, flow_rates.size) :
-    mean_flow_rate += flow_rates[i]
+  for i in range(0, mean_flow_rates.size) :
+    mean_flow_rate += mean_flow_rates[i]
 
-  mean_flow_rate /= flow_rates.size
+  mean_flow_rate /= mean_flow_rates.size
   return mean_flow_rate
 
 def calculate_deduced_flow_rates(densities, max_velocity, max_density) :
