@@ -28,26 +28,31 @@ def calculate_velocities(vehicle_distances, time_step) :
 
 def calculate_mean_velocities(velocities) :
     rows, cols = velocities.shape
-    mean_velocities = np.zeros(rows)
+    mean_velocities = np.zeros(cols)
     number_of_non_zero_velocities = 0
 
-    for i in range(0, rows) :
-        for j in range(0, cols) :
+    for j in range(0, cols) :
+        for i in range(0, rows) :
             if velocities[i][j] != 0 :
-                mean_velocities[i] += velocities[i][j]
+                mean_velocities[j] += velocities[i][j]
                 number_of_non_zero_velocities += 1
         if number_of_non_zero_velocities != 0 :
-            mean_velocities[i] /= number_of_non_zero_velocities
+            mean_velocities[j] /= number_of_non_zero_velocities
         number_of_non_zero_velocities = 0
 
     return mean_velocities
 
 def calculate_mean_velocity(mean_velocities) :
     mean_velocity = 0
+    number_of_non_zero_velocities = 0
 
     for i in range(0, mean_velocities.size) :
-        mean_velocity += mean_velocities[i]
-    mean_velocity /= mean_velocities.size
+        if mean_velocities[i] != 0 :
+            mean_velocity += mean_velocities[i]
+            number_of_non_zero_velocities += 1
+
+    if number_of_non_zero_velocities != 0 :
+        mean_velocity /= number_of_non_zero_velocities
 
     return mean_velocity
 
@@ -111,4 +116,11 @@ def calculate_mean_flow_rate(flow_rates) :
     mean_flow_rate /= flow_rates.size
     return mean_flow_rate
 
+def calculate_deduced_flow_rates(densities, max_velocity, max_density) :
+    flow_rates = np.zeros(densities.size)
+
+    for i in range(0, flow_rates.size) :
+        flow_rates[i] = max_velocity * ( densities[i] - ((densities[i]**2) / max_density) )
+
+    return flow_rates
 
