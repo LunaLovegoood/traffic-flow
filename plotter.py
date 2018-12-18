@@ -30,7 +30,7 @@ def plot_fundamental_diagram(tabled_density_values, deduced_flow_rates, mean_den
   # Підписуємо графік
   plt.figure("Фундаментальна діаграма транспортних потоків")
   plt.title("Фундаментальна діаграма транспортних потоків")
-  plt.xlabel(r'Густина $\rho$ (авто/100м)')
+  plt.xlabel(r'Густина $\rho$ (ксть авто/25м)')
   plt.ylabel(r'Потік $f$ (авто/с)')
 
   plt.plot(tabled_density_values, deduced_flow_rates, color='b') # Будуємо фундаментальну діаграму
