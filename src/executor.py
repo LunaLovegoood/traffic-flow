@@ -69,25 +69,42 @@ max_flow_rate = deduced_flow_rates.max()
 # Статистичний аналіз
 #
 
-sorted_velocity_values = statistics_analysis.sort_velocity_values(plane_velocities)
+sorted_velocity_values = statistics_analysis.sort_velocity_values(
+  conv.m_per_sec_to_km_per_h(plane_velocities))
 min, max = statistics_analysis.get_min_and_max_velocity_values(sorted_velocity_values)
 step = statistics_analysis.calculate_step(min, max, sorted_velocity_values.size)
-centers_of_intervals, densities_for_histogram = \
-    statistics_analysis.calculate_data_for_histogram(sorted_velocity_values, min, max, step, sorted_velocity_values.size)
+
+centers_of_intervals, quantities_of_velocities_per_interval, densities_for_histogram = \
+    statistics_analysis.calculate_data_for_histogram(
+        sorted_velocity_values, min, max, 
+        step, sorted_velocity_values.size
+      )
+
+mean = statistics_analysis.calculate_mean(centers_of_intervals, 
+    quantities_of_velocities_per_interval, sorted_velocity_values.size) # Середнє значення
+variance = statistics_analysis.calculate_variance(centers_of_intervals, 
+    quantities_of_velocities_per_interval, sorted_velocity_values.size, mean) # Дисперсія
+deviation = statistics_analysis.calculate_deviation(variance) # Середнє квадратичне відхилення
+
+density_values = statistics_analysis.calculate_density_values(centers_of_intervals, mean, deviation)
+interval_probabilities = statistics_analysis.calculate_probability_values(centers_of_intervals, mean, deviation)
+cumulative_probability_function = statistics_analysis.calculate_cumulative_probability_function(interval_probabilities)
+
+
 
 #
 # Виведення результатів
 #
 
-out_mng.print_basic_constants(road_interval, number_of_lanes, number_of_vehicles, number_of_time_stamps)
-out_mng.print_max_values(max_velocity, max_density, max_flow_rate)
-out_mng.print_mean_values(mean_velocity, mean_density, mean_flow_rate)
+#out_mng.print_basic_constants(road_interval, number_of_lanes, number_of_vehicles, number_of_time_stamps)
+#out_mng.print_max_values(max_velocity, max_density, max_flow_rate)
+#out_mng.print_mean_values(mean_velocity, mean_density, mean_flow_rate)
 
 #
 # Створення та виведення графіків
 #
 
-plotter.plot_velocity_distribution(plane_velocities)
-plotter.plot_calculated_velocity_distribution(centers_of_intervals, densities_for_histogram)
-plotter.plot_fundamental_diagram(tabled_density_values, deduced_flow_rates, mean_densities, mean_flow_rates)
-plotter.show_plots()
+#plotter.plot_velocity_distribution(plane_velocities)
+#plotter.plot_calculated_velocity_distribution(centers_of_intervals, densities_for_histogram)
+#plotter.plot_fundamental_diagram(tabled_density_values, deduced_flow_rates, mean_densities, mean_flow_rates)
+#plotter.show_plots()

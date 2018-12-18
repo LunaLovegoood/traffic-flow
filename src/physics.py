@@ -38,11 +38,11 @@ def calculate_velocities(vehicle_distances, time_step) :
         velocities[i][j] = vehicle_distances[i][j] / time_step
         number_of_vehicles += 1
 
-  plane_velocities = calculate_plane_velocities(number_of_vehicles, velocities, rows, cols)
+  plane_velocities = __calculate_plane_velocities(number_of_vehicles, velocities, rows, cols)
 
   return (velocities, plane_velocities)
 
-def calculate_plane_velocities(number_of_vehicles, velocities, rows, cols) :
+def __calculate_plane_velocities(number_of_vehicles, velocities, rows, cols) :
   """ Повертає швидкості в одновимірному масиві """
   plane_velocities = np.zeros(number_of_vehicles)
   index = 0
@@ -106,33 +106,33 @@ def calculate_densities(vehicle_distances, road_interval, number_of_lanes, vehic
 
   for time_moment in range(0, densities.shape[1]) :
     for interval_index in range(0, densities.shape[0]) :
-      densities[interval_index][time_moment] = number_of_vehicles_in_the_interval(
+      densities[interval_index][time_moment] = __number_of_vehicles_in_the_interval(
           positions,
           current_position, current_position + unit_length)
       if densities[interval_index][time_moment] != 0 :
         densities[interval_index][time_moment] = (densities[interval_index][time_moment]*vehicle_length) / total_length_of_unit_length
-      positions = update_positions(positions, vehicle_distances, time_moment)
+      positions = __update_positions(positions, vehicle_distances, time_moment)
       current_position += unit_length
     positions = np.copy(starting_positions)
     current_position = 0
 
   return densities
 
-def number_of_vehicles_in_the_interval(positions, lower_bound, upper_bound) :
+def __number_of_vehicles_in_the_interval(positions, lower_bound, upper_bound) :
   """ Обчислює ксть авто в заданому інтервалі в певний момент часу """
   number_of_vehicles = 0
 
   for i in range(0, positions.size) :
-    if is_inside_interval(positions[i], lower_bound, upper_bound) :
+    if __is_inside_interval(positions[i], lower_bound, upper_bound) :
       number_of_vehicles += 1
   
   return number_of_vehicles
 
-def is_inside_interval(value, lower_bound, upper_bound) :
+def __is_inside_interval(value, lower_bound, upper_bound) :
   """ Визначає чи є заданий автомобіль в заданому інтервалі  """
   return (value >= lower_bound and value < upper_bound)
 
-def update_positions(positions, vehicle_distances, time_moment) :
+def __update_positions(positions, vehicle_distances, time_moment) :
   """ Оновлює позиції автомобілів """
   updated_positions = positions
 

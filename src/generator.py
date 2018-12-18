@@ -42,11 +42,11 @@ def generate_distances(
   shift = 2.0
 
   distances = np.zeros((number_of_vehicles, number_of_time_stamps))
-  starting_positions = generate_starting_positions(number_of_vehicles, average_number_of_vehicles, 
+  starting_positions = __generate_starting_positions(number_of_vehicles, average_number_of_vehicles, 
       vehicle_length, road_interval, number_of_lanes)
   positions = np.copy(starting_positions)
 
-  first_unexistent_vehicle_index = find_first_unexistent_vehicle(positions)
+  first_unexistent_vehicle_index = __find_first_unexistent_vehicle(positions)
 
   for i in range(0, number_of_time_stamps) :
     if first_unexistent_vehicle_index < number_of_vehicles :
@@ -56,7 +56,7 @@ def generate_distances(
     for j in range(0, first_unexistent_vehicle_index) :
       if positions[j] == road_interval :
         continue
-      distances[j][i] = calculate_velocity_shift(mean_speed, speed_deviation, shift)
+      distances[j][i] = __calculate_velocity_shift(mean_speed, speed_deviation, shift)
       if distances[j][i] < 0 :
         distances[j][i] = 0
       if (positions[j] + distances[j][i]) <= road_interval :
@@ -67,7 +67,7 @@ def generate_distances(
 
   return [distances, positions, starting_positions]
 
-def calculate_velocity_shift(mean_speed, speed_deviation, shift) :
+def __calculate_velocity_shift(mean_speed, speed_deviation, shift) :
   """ Повертає відстань, яку проїде авто за одиницю часу """
   gamma_shift = np.random.gamma(9, 0.5) - 2.0
   velocity_shift = np.random.normal(mean_speed, speed_deviation) + gamma_shift - shift
@@ -81,7 +81,7 @@ def calculate_velocity_shift(mean_speed, speed_deviation, shift) :
 
   return velocity_shift
 
-def generate_starting_positions(number_of_vehicles, average_number_of_vehicles,
+def __generate_starting_positions(number_of_vehicles, average_number_of_vehicles,
     vehicle_length, road_interval, number_of_lanes) :
   """ Генерує початкові позиції автомобілів """
   starting_positions = np.zeros(number_of_vehicles)
@@ -99,7 +99,7 @@ def generate_starting_positions(number_of_vehicles, average_number_of_vehicles,
         position = position_shift
       starting_positions[i + j] = position if (position <= road_interval) else 0
   
-  first_unexistent_vehicle_index = find_first_unexistent_vehicle(starting_positions)
+  first_unexistent_vehicle_index = __find_first_unexistent_vehicle(starting_positions)
   reverse_index = first_unexistent_vehicle_index - 1
 
   for i in range(0, first_unexistent_vehicle_index) :
@@ -112,7 +112,7 @@ def generate_starting_positions(number_of_vehicles, average_number_of_vehicles,
 
   return starting_positions
 
-def find_first_unexistent_vehicle(starting_positions) :
+def __find_first_unexistent_vehicle(starting_positions) :
   """ Знаходить останній автомобіль, який знаходиться в даному інтервалі дороги """
   vehicle_index = 0
 

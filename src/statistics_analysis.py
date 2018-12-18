@@ -23,6 +23,15 @@
 import numpy as np
 
 from math import log
+from math import sqrt
+from math import exp
+from math import pi
+
+from scipy.integrate import quad
+
+#
+# Функція для формування гістограми
+#
 
 def sort_velocity_values(velocities) :
   """ Сортує вибірку зі значень швидкості """
@@ -39,17 +48,17 @@ def calculate_step(min, max, size) :
 
 def calculate_data_for_histogram(sorted_velocity_values, min, max, step, size) :
   """" Підраховуємо необхідні дані для гістограми """
-  intervals = np.zeros((calculate_number_of_intervals(min, max, step), 2))
-  intervals = calculate_histogram_intervals(intervals, min, step)
-  centers_of_intervals = calculate_centers_of_intervals(intervals)
+  intervals = np.zeros((__calculate_number_of_intervals(min, max, step), 2))
+  intervals = __calculate_histogram_intervals(intervals, min, step)
+  centers_of_intervals = __calculate_centers_of_intervals(intervals)
 
-  quantities_of_velocities_per_interval = calculate_number_of_velocties_per_interval(sorted_velocity_values, intervals)
-  frequencies = calculate_frequencies(quantities_of_velocities_per_interval, size)
-  densities = calculate_densities_for_histogram(frequencies, step)
+  quantities_of_velocities_per_interval = __calculate_number_of_velocties_per_interval(sorted_velocity_values, intervals)
+  frequencies = __calculate_frequencies(quantities_of_velocities_per_interval, size)
+  densities = __calculate_densities_for_histogram(frequencies, step)
 
-  return (centers_of_intervals, densities)
+  return (centers_of_intervals, quantities_of_velocities_per_interval, densities)
 
-def calculate_number_of_intervals(min, max, step) :
+def __calculate_number_of_intervals(min, max, step) :
   """ Підраховуємо ксть інтервалів на діаграмі """
   number_of_intervals = 0
   current_position = min
@@ -60,7 +69,7 @@ def calculate_number_of_intervals(min, max, step) :
 
   return number_of_intervals
 
-def calculate_histogram_intervals(intervals, min, step) :
+def __calculate_histogram_intervals(intervals, min, step) :
   """ Обчислюємо значення інтервалів для побудови гістограми """
   calculated_intervals = intervals
   current_position = min
@@ -72,7 +81,7 @@ def calculate_histogram_intervals(intervals, min, step) :
 
   return calculated_intervals
 
-def calculate_centers_of_intervals(intervals) :
+def __calculate_centers_of_intervals(intervals) :
   """ Обчислюємо центри інтервалів """
   centers_of_intervals = np.zeros(intervals.shape[0])
 
@@ -82,7 +91,7 @@ def calculate_centers_of_intervals(intervals) :
 
   return centers_of_intervals
 
-def calculate_number_of_velocties_per_interval(sorted_velocity_values, intervals) :
+def __calculate_number_of_velocties_per_interval(sorted_velocity_values, intervals) :
   """ Обчислюємо ксті швидкостей для кожного інтервалу """
   quantities_of_velocities_per_interval = np.zeros(intervals.shape[0], dtype=int)
   number_of_velocities = 0
@@ -101,7 +110,7 @@ def calculate_number_of_velocties_per_interval(sorted_velocity_values, intervals
 
   return quantities_of_velocities_per_interval
 
-def calculate_frequencies(quantities_of_velocities_per_interval, size) :
+def __calculate_frequencies(quantities_of_velocities_per_interval, size) :
   """" Обчислюємо відносні частоти """
   frequencies = np.zeros(quantities_of_velocities_per_interval.size)
 
@@ -110,7 +119,7 @@ def calculate_frequencies(quantities_of_velocities_per_interval, size) :
 
   return frequencies
 
-def calculate_densities_for_histogram(frequencies, step) :
+def __calculate_densities_for_histogram(frequencies, step) :
   """" Обчислюємо щільності """
   densities = np.zeros(frequencies.size)
 
@@ -118,3 +127,105 @@ def calculate_densities_for_histogram(frequencies, step) :
     densities[i] = frequencies[i] / step
 
   return densities
+
+#
+# Функція для перевірки гіпотез
+#
+
+def calculate_mean(centers_of_intervals, quantities_of_velocities_per_interval, size) :
+  """ Обчислює середнє значення """
+  mean = 0
+
+  for i in range(0, centers_of_intervals.size) :
+    mean += centers_of_intervals[i] * quantities_of_velocities_per_interval[i]
+
+  mean /= size
+  return mean
+
+def calculate_variance(centers_of_intervals, quantities_of_velocities_per_interval, size, mean) :
+  """" Обчислює дисперсію """
+  variance = 0
+
+  for i in range(0, centers_of_intervals.size) :
+    normalized_value = centers_of_intervals[i] - mean
+    variance += (normalized_value*normalized_value) * quantities_of_velocities_per_interval[i]
+
+  variance /= (size - 1)
+  return variance
+
+def calculate_deviation(variance) :
+  """ Обчислює середнє квадратичне відхилення """
+  return sqrt(variance)
+
+def calculate_density_values(centers_of_intervals, mean, deviation) :
+  """ Обчислюємо значення функції щільності """
+  density_values = np.zeros(centers_of_intervals.size)
+
+  t_values = __calculate_t_values_for_density(centers_of_intervals, mean, deviation)
+  phi_values = __calculate_phi_values_for_density(t_values)
+  
+  for i in range(0, density_values.size) :
+    density_values[i] = phi_values[i] / deviation
+
+  return density_values
+
+def __calculate_t_values_for_density(centers_of_intervals, mean, deviation) :
+  """ Обчислюємо значення т ітих """
+  t_values = np.zeros(centers_of_intervals.size)
+
+  for i in range(0, t_values.size) :
+    t_values[i] = (centers_of_intervals[i] - mean) / deviation
+
+  return t_values
+
+def __calculate_phi_values_for_density(t_values) :
+  """ Обчислюємо значення фі """
+  phi_values = np.zeros(t_values.size)
+  divisor = sqrt(2 * pi)
+
+  for i in range(0, phi_values.size) :
+    phi_values[i] = __normalized_gaussian_function(t_values[i]) / divisor
+
+  return phi_values
+
+def __normalized_gaussian_function(x) :
+  """ Обчислюємо значення функції exp(-(x*x) / 2) """
+  return exp(-(x*x) / 2)
+
+def calculate_probability_values(centers_of_intervals, mean, deviation) :
+  """ Обчислює ймовірності на всіх інтервалах """
+  interval_probabilities = np.zeros(centers_of_intervals.size)
+  half_step = (centers_of_intervals[1] - centers_of_intervals[0]) / 2
+
+  for i in range(0, interval_probabilities.size) :
+    interval_probabilities[i] = __calculate_probability(
+        mean, deviation, 
+        centers_of_intervals[i] - half_step, centers_of_intervals[i] + half_step
+      )
+
+  return interval_probabilities
+
+def __calculate_probability(mean, deviation, lower_bound, upper_bound) :
+  """ Обчислює значення інтегральної функції ймовірності на заданому інтервалі """
+  probability = 0
+  first_value = (upper_bound - mean) / deviation
+  second_value = (lower_bound - mean) / deviation
+
+  probability = __integral_normalized_gaussian_function(first_value) - __integral_normalized_gaussian_function(second_value)
+
+  return probability
+
+def __integral_normalized_gaussian_function(x) :
+  """ Обчислює значення інтегральної функцій Гаусса """
+  value = 0
+  divisor = sqrt(2 * pi)
+
+  (integral_value, _) = quad(__normalized_gaussian_function, -np.inf, x)
+  value = integral_value / divisor
+
+  return value
+
+def calculate_cumulative_probability_function(interval_probabilities) :
+  """ Обчислює значення інтегральної функції ймовірності """
+  return np.add.accumulate(interval_probabilities)
+  
