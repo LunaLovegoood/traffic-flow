@@ -57,7 +57,14 @@ def generate_distances(
       if positions[j] == road_interval :
         continue
       gamma_shift = np.random.gamma(9, 0.5) - 2.0
-      distances[j][i] = np.random.normal(mean_speed, speed_deviation) + gamma_shift - shift
+      velocity_shift = np.random.normal(mean_speed, speed_deviation) + gamma_shift - shift
+      if velocity_shift < 0.5*mean_speed :
+        velocity_shift -= 0.3*np.random.gamma(9, 0.5)
+      elif velocity_shift < mean_speed :
+        velocity_shift -= 0.1*np.random.gamma(9, 0.5)
+      else :
+        velocity_shift -= 0.2*np.random.gamma(9, 0.5)
+      distances[j][i] = velocity_shift
       if distances[j][i] < 0 :
         distances[j][i] = 0
       if (positions[j] + distances[j][i]) <= road_interval :
