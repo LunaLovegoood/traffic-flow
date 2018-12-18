@@ -21,13 +21,16 @@
 # SOFTWARE.
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 from constants import *
 import generator as gen
 import convertor as conv
 import physics as phys
+import statistics_analysis
 import output_manager as out_mng
 import plotter
+
 
 # Отримуємо величини змін положень авто на відрізку дороги, а також їх кінцеві та початкові позиції
 vehicle_distances, positions, starting_positions = gen.generate_distances(
@@ -64,6 +67,41 @@ deduced_flow_rates = phys.calculate_deduced_flow_rates(tabled_density_values, ma
 max_flow_rate = deduced_flow_rates.max()
 
 #
+# Статистичний аналіз
+#
+
+sorted_velocity_values = statistics_analysis.sort_velocity_values(
+  conv.m_per_sec_to_km_per_h(plane_velocities))
+min, max = statistics_analysis.get_min_and_max_velocity_values(sorted_velocity_values)
+step = statistics_analysis.calculate_step(min, max, sorted_velocity_values.size)
+
+centers_of_intervals, quantities_of_velocities_per_interval, densities_for_histogram = \
+    statistics_analysis.calculate_data_for_histogram(
+        sorted_velocity_values, min, max, 
+        step, sorted_velocity_values.size
+      )
+
+mean = statistics_analysis.calculate_mean(centers_of_intervals, 
+    quantities_of_velocities_per_interval, sorted_velocity_values.size) # Середнє значення
+variance = statistics_analysis.calculate_variance(centers_of_intervals, 
+    quantities_of_velocities_per_interval, sorted_velocity_values.size, mean) # Дисперсія
+deviation = statistics_analysis.calculate_deviation(variance) # Середнє квадратичне відхилення
+
+density_values = statistics_analysis.calculate_density_values(centers_of_intervals, mean, deviation)
+interval_probabilities = statistics_analysis.calculate_probability_values(centers_of_intervals, mean, deviation)
+cumulative_probability_function = statistics_analysis.calculate_cumulative_probability_function(interval_probabilities)
+
+is_normal_by_pearson, calculated_chi_value, critical_chi_value = statistics_analysis.is_normal_by_pearson(
+    quantities_of_velocities_per_interval, interval_probabilities,
+    sorted_velocity_values.size, 
+    significance_level, number_of_paramaters
+  )
+confidence_interval, deviation_of_estimation = statistics_analysis.get_confidence_interval(mean, variance, sorted_velocity_values.size)
+print(is_normal_by_pearson)
+print(confidence_interval)
+print(deviation_of_estimation)
+
+#
 # Виведення результатів
 #
 
@@ -76,5 +114,6 @@ out_mng.print_mean_values(mean_velocity, mean_density, mean_flow_rate)
 #
 
 plotter.plot_velocity_distribution(plane_velocities)
+plotter.plot_calculated_velocity_distribution(centers_of_intervals, densities_for_histogram)
 plotter.plot_fundamental_diagram(tabled_density_values, deduced_flow_rates, mean_densities, mean_flow_rates)
 plotter.show_plots()

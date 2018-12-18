@@ -45,3 +45,7 @@ speed_deviation = conv.km_per_h_to_m_per_sec(10.0) #(км/год)
 # Константи густини
 max_density = phys.max_density(number_of_lanes, vehicle_length)
 tabled_density_values = gen.generate_tabled_density_values(max_density)
+
+# Статистичні константи
+significance_level = 0.05
+number_of_paramaters = 2

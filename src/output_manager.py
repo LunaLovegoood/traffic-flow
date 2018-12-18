@@ -34,12 +34,12 @@ def print_max_values(max_velocity, max_density, max_flow_rate) :
   """ Виведення максимальних значень величин моделі """
   print('Максимальні значення:')
   print('Максимальне значення швидкості max(v) = ', conv.m_per_sec_to_km_per_h(max_velocity), ' (км/год)')
-  print('Максимальне значення густини max(густини) = ', max_density, ' (ксть авто/25м)')
+  print('Максимальне значення густини max(густини) = ', max_density)
   print('Максимальне значення потоку max(f) = ', max_flow_rate, ' (авто/с)', end='\n\n')
 
 def print_mean_values(mean_velocity, mean_density, mean_flow_rate) :
   """ Виведення середніх значень величин моделі """
   print('Середні значення:')
   print('Середнє значення швидкості <v> = ', conv.m_per_sec_to_km_per_h(mean_velocity), ' (км/год)')
-  print('Середнє значення густини <густина> = ', mean_density, ' (ксть авто/25м)')
+  print('Середнє значення густини <густина> = ', mean_density)
   print('Середнє значення потоку <f> = ', mean_flow_rate, ' (авто/с)', end='\n\n')
