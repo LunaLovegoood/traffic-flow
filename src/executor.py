@@ -21,11 +21,13 @@
 # SOFTWARE.
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 from constants import *
 import generator as gen
 import convertor as conv
 import physics as phys
+import statistics_analysis
 import output_manager as out_mng
 import plotter
 
@@ -64,6 +66,16 @@ deduced_flow_rates = phys.calculate_deduced_flow_rates(tabled_density_values, ma
 max_flow_rate = deduced_flow_rates.max()
 
 #
+# Статистичний аналіз
+#
+
+sorted_velocity_values = statistics_analysis.sort_velocity_values(plane_velocities)
+min, max = statistics_analysis.get_min_and_max_velocity_values(sorted_velocity_values)
+step = statistics_analysis.calculate_step(min, max, sorted_velocity_values.size)
+centers_of_intervals, densities_for_histogram = \
+    statistics_analysis.calculate_data_for_histogram(sorted_velocity_values, min, max, step, sorted_velocity_values.size)
+
+#
 # Виведення результатів
 #
 
@@ -76,5 +88,6 @@ out_mng.print_mean_values(mean_velocity, mean_density, mean_flow_rate)
 #
 
 plotter.plot_velocity_distribution(plane_velocities)
+plotter.plot_calculated_velocity_distribution(centers_of_intervals, densities_for_histogram)
 plotter.plot_fundamental_diagram(tabled_density_values, deduced_flow_rates, mean_densities, mean_flow_rates)
 plotter.show_plots()

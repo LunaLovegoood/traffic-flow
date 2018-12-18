@@ -29,8 +29,8 @@ import convertor as conv
 def plot_velocity_distribution(plane_velocities) :
   """ Рисує графік розподілу швидкості транспорту """
   # Підписуємо графік
-  plt.figure("Розподіл швидкості")
-  plt.title("Розподіл швидкості")
+  plt.figure("Розподіл швидкості (Python built-in)")
+  plt.title("Розподіл швидкості (Python built-in)")
   plt.xlabel(r'Швидкість $v$ (км/год)')
   plt.ylabel(r'Ймовірність швидкості $p$')
   plt.get_current_fig_manager().window.state('zoomed')
@@ -40,14 +40,34 @@ def plot_velocity_distribution(plane_velocities) :
   velocity_values = np.array(0.5*(bins[1:]+bins[:-1]))
 
   # Отримуємо значення для побудови інтерпольованого графіку розподілу швидкості
-  tabled_velocity_values = np.linspace(0, velocity_values.max(), 1000)
+  tabled_velocity_values = np.linspace(velocity_values.min(), velocity_values.max(), 1000)
   spliner = make_interp_spline(velocity_values, velocity_probabilities)
   interpolated_velocity_probabilities = spliner(tabled_velocity_values)
 
   plt.plot(tabled_velocity_values, interpolated_velocity_probabilities, 
       color='#ffc214', label='Функція щільності розподілу швидкості') # Будуємо інтерпольований графік розподілу швидкості
   plt.hist(conv.plane_velocities_to_km_per_h(plane_velocities), 
-      bins=50, density=True, color='c', histtype='bar', ec='black', label='Гістограми значень швидкості') # Будуємо гістограму значень швидкості
+      bins=50, density=True, color='c', histtype='bar', edgecolor='black', label='Гістограма значень швидкості') # Будуємо гістограму значень швидкості
+  plt.legend(loc='upper left')
+
+def plot_calculated_velocity_distribution(centers_of_intervals, densities) :
+  """ Рисує графік розподілу швидкості транспорту згідно з обчисленими статистичними даними """
+  # Підписуємо графік
+  plt.figure("Розподіл швидкості")
+  plt.title("Розподіл швидкості")
+  plt.xlabel(r'Швидкість $v$ (км/год)')
+  plt.ylabel(r'Ймовірність швидкості $p$')
+  plt.get_current_fig_manager().window.state('zoomed')
+
+  # Отримуємо значення для побудови інтерпольованого графіку розподілу швидкості
+  tabled_velocity_values = np.linspace(centers_of_intervals.min(), centers_of_intervals.max(), 1000)
+  spliner = make_interp_spline(centers_of_intervals, densities)
+  interpolated_velocity_probabilities = spliner(tabled_velocity_values)
+
+  plt.plot(tabled_velocity_values, interpolated_velocity_probabilities, 
+      color='#ffc214', label='Функція щільності розподілу швидкості') # Будуємо інтерпольований графік розподілу швидкості
+  plt.bar(centers_of_intervals, densities, width=(centers_of_intervals[1] - centers_of_intervals[0]),
+      color='cyan', edgecolor='black', label='Гістограма значень швидкості') # Будуємо гістограму значень швидкості
   plt.legend(loc='upper left')
 
 def plot_fundamental_diagram(tabled_density_values, deduced_flow_rates, mean_densities, mean_flow_rates) :
@@ -55,7 +75,7 @@ def plot_fundamental_diagram(tabled_density_values, deduced_flow_rates, mean_den
   # Підписуємо графік
   plt.figure("Фундаментальна діаграма транспортних потоків")
   plt.title("Фундаментальна діаграма транспортних потоків")
-  plt.xlabel(r'Густина $\rho$ (ксть авто/25м)')
+  plt.xlabel(r'Густина $\rho$')
   plt.ylabel(r'Потік $f$ (авто/с)')
   plt.get_current_fig_manager().window.state('zoomed')
 
