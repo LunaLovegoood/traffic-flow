@@ -23,7 +23,7 @@
 import numpy as np
 
 #
-# Velocity functions
+# Функції з обчисленнями швидкостей
 #
 
 def calculate_velocities(vehicle_distances, time_step) :
@@ -88,7 +88,7 @@ def calculate_mean_velocity(mean_velocities) :
   return mean_velocity
 
 #
-# Density functions
+# Функції з обчисленнями густини
 #
 
 def max_density(number_of_lanes, vehicle_length) :
@@ -172,7 +172,7 @@ def calculate_mean_density(mean_densities) :
   return mean_density
 
 #
-# Flow rate functions
+# Функції з обчисленнями потоку
 #
 
 def calculate_flow_rates(mean_velocities, densities) :

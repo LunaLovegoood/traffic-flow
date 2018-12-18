@@ -26,6 +26,7 @@ from constants import *
 import generator as gen
 import convertor as conv
 import physics as phys
+import output_manager as out_mng
 import plotter
 
 # Отримуємо величини змін положень авто на відрізку дороги, а також їх кінцеві та початкові позиції
@@ -63,30 +64,12 @@ deduced_flow_rates = phys.calculate_deduced_flow_rates(tabled_density_values, ma
 max_flow_rate = deduced_flow_rates.max()
 
 #
-# Виведення базових константних величин моделі
+# Виведення результатів
 #
 
-print('Базові константи: ')
-print('Величина інтервалу дороги: ', conv.m_to_km(road_interval), ' (км)')
-print('Кількість смуг дороги: ', number_of_lanes)
-print('Кількість автомобілів: ', number_of_vehicles)
-print('Кількість часових відліків: ', number_of_time_stamps, end='\n\n')
-
-#
-# Виведення обчислених результатів моделі
-#
-
-# Виведення максимальних значень величин моделі
-print('Максимальні значення:')
-print('Максимальне значення швидкості max(v) = ', conv.m_per_sec_to_km_per_h(max_velocity), ' (км/год)')
-print('Максимальне значення густини max(густини) = ', max_density, ' (ксть авто/25м)')
-print('Максимальне значення потоку max(f) = ', max_flow_rate, ' (авто/с)', end='\n\n')
-
-# Виведення середніх значень величин моделі
-print('Середні значення:')
-print('Середнє значення швидкості <v> = ', conv.m_per_sec_to_km_per_h(mean_velocity), ' (км/год)')
-print('Середнє значення густини <густина> = ', mean_density, ' (ксть авто/25м)')
-print('Середнє значення потоку <f> = ', mean_flow_rate, ' (авто/с)', end='\n\n')
+out_mng.print_basic_constants(road_interval, number_of_lanes, number_of_vehicles, number_of_time_stamps)
+out_mng.print_max_values(max_velocity, max_density, max_flow_rate)
+out_mng.print_mean_values(mean_velocity, mean_density, mean_flow_rate)
 
 #
 # Створення та виведення графіків
