@@ -28,6 +28,7 @@ from math import exp
 from math import pi
 
 from scipy.integrate import quad
+from scipy.stats import chi2
 
 #
 # Функція для формування гістограми
@@ -220,7 +221,7 @@ def __integral_normalized_gaussian_function(x) :
   value = 0
   divisor = sqrt(2 * pi)
 
-  (integral_value, _) = quad(__normalized_gaussian_function, -np.inf, x)
+  (integral_value, _) = quad(__normalized_gaussian_function, 0, x)
   value = integral_value / divisor
 
   return value
@@ -228,4 +229,44 @@ def __integral_normalized_gaussian_function(x) :
 def calculate_cumulative_probability_function(interval_probabilities) :
   """ Обчислює значення інтегральної функції ймовірності """
   return np.add.accumulate(interval_probabilities)
+
+def is_normal_by_pearson(frequencies, interval_probabilities, size, significance_level, number_of_paramaters) :
+  """ Визначає чи розподіл є нормальним за критерієм Пірсона """
+  calculated_chi_value = 0
+  critical_chi_value = 0
+
+  theoretical_frequencies = np.array(interval_probabilities * size, dtype=int)
+  for i in range(0, theoretical_frequencies.size) :
+    if frequencies[i] < 0.15*frequencies.max() :
+      theoretical_frequencies[i] = frequencies[i]
+    if theoretical_frequencies[i] == 0 :
+      theoretical_frequencies[i] = 1
+  if theoretical_frequencies.sum() < frequencies.sum() :
+    theoretical_frequencies[int(theoretical_frequencies.size / 2)] += frequencies.sum() - theoretical_frequencies.sum()
   
+  numerator = (frequencies - theoretical_frequencies) ** 2
+  calculated_chi_value = (numerator / theoretical_frequencies).sum()
+  calculated_chi_value = ((frequencies*frequencies) / theoretical_frequencies).sum() - size
+  
+  degrees_of_freedom = frequencies.size - number_of_paramaters - 1
+  critical_chi_value = chi2.isf(significance_level, degrees_of_freedom)
+
+  return (critical_chi_value > calculated_chi_value, calculated_chi_value, critical_chi_value)
+
+def get_confidence_interval(mean, variance, size, alpha=0.95) :
+  lower_bound, upper_bound = 0, 0
+
+  deviation_of_estimation = sqrt(variance/size)
+  function_value = alpha/2
+
+  t = 0
+  current_value = __integral_normalized_gaussian_function(t)
+  while (current_value > function_value - 0.0001 and current_value < function_value + 0.0001) == False :
+    t += 0.0001
+    current_value = __integral_normalized_gaussian_function(t)
+  t = float("%.2f" % t)
+
+  estimation = (t*sqrt(variance))/(sqrt(size))
+  lower_bound, upper_bound = mean - estimation, mean + estimation
+
+  return ((lower_bound, upper_bound), deviation_of_estimation)

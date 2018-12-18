@@ -31,6 +31,7 @@ import statistics_analysis
 import output_manager as out_mng
 import plotter
 
+
 # Отримуємо величини змін положень авто на відрізку дороги, а також їх кінцеві та початкові позиції
 vehicle_distances, positions, starting_positions = gen.generate_distances(
     number_of_vehicles, number_of_lanes, vehicle_length, 
@@ -90,21 +91,29 @@ density_values = statistics_analysis.calculate_density_values(centers_of_interva
 interval_probabilities = statistics_analysis.calculate_probability_values(centers_of_intervals, mean, deviation)
 cumulative_probability_function = statistics_analysis.calculate_cumulative_probability_function(interval_probabilities)
 
-
+is_normal_by_pearson, calculated_chi_value, critical_chi_value = statistics_analysis.is_normal_by_pearson(
+    quantities_of_velocities_per_interval, interval_probabilities,
+    sorted_velocity_values.size, 
+    significance_level, number_of_paramaters
+  )
+confidence_interval, deviation_of_estimation = statistics_analysis.get_confidence_interval(mean, variance, sorted_velocity_values.size)
+print(is_normal_by_pearson)
+print(confidence_interval)
+print(deviation_of_estimation)
 
 #
 # Виведення результатів
 #
 
-#out_mng.print_basic_constants(road_interval, number_of_lanes, number_of_vehicles, number_of_time_stamps)
-#out_mng.print_max_values(max_velocity, max_density, max_flow_rate)
-#out_mng.print_mean_values(mean_velocity, mean_density, mean_flow_rate)
+out_mng.print_basic_constants(road_interval, number_of_lanes, number_of_vehicles, number_of_time_stamps)
+out_mng.print_max_values(max_velocity, max_density, max_flow_rate)
+out_mng.print_mean_values(mean_velocity, mean_density, mean_flow_rate)
 
 #
 # Створення та виведення графіків
 #
 
-#plotter.plot_velocity_distribution(plane_velocities)
-#plotter.plot_calculated_velocity_distribution(centers_of_intervals, densities_for_histogram)
-#plotter.plot_fundamental_diagram(tabled_density_values, deduced_flow_rates, mean_densities, mean_flow_rates)
-#plotter.show_plots()
+plotter.plot_velocity_distribution(plane_velocities)
+plotter.plot_calculated_velocity_distribution(centers_of_intervals, densities_for_histogram)
+plotter.plot_fundamental_diagram(tabled_density_values, deduced_flow_rates, mean_densities, mean_flow_rates)
+plotter.show_plots()

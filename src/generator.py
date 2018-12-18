@@ -56,7 +56,7 @@ def generate_distances(
     for j in range(0, first_unexistent_vehicle_index) :
       if positions[j] == road_interval :
         continue
-      distances[j][i] = __calculate_velocity_shift(mean_speed, speed_deviation, shift)
+      distances[j][i] = np.random.normal(mean_speed, speed_deviation)
       if distances[j][i] < 0 :
         distances[j][i] = 0
       if (positions[j] + distances[j][i]) <= road_interval :
@@ -66,20 +66,6 @@ def generate_distances(
         positions[j] = road_interval
 
   return [distances, positions, starting_positions]
-
-def __calculate_velocity_shift(mean_speed, speed_deviation, shift) :
-  """ Повертає відстань, яку проїде авто за одиницю часу """
-  gamma_shift = np.random.gamma(9, 0.5) - 2.0
-  velocity_shift = np.random.normal(mean_speed, speed_deviation) + gamma_shift - shift
-
-  if velocity_shift < 0.5*mean_speed :
-    velocity_shift -= 0.3*np.random.gamma(9, 0.5)
-  elif velocity_shift < mean_speed :
-    velocity_shift -= 0.1*np.random.gamma(9, 0.5)
-  else :
-    velocity_shift -= 0.2*np.random.gamma(9, 0.5)
-
-  return velocity_shift
 
 def __generate_starting_positions(number_of_vehicles, average_number_of_vehicles,
     vehicle_length, road_interval, number_of_lanes) :
