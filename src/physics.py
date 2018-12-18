@@ -38,6 +38,12 @@ def calculate_velocities(vehicle_distances, time_step) :
         velocities[i][j] = vehicle_distances[i][j] / time_step
         number_of_vehicles += 1
 
+  plane_velocities = calculate_plane_velocities(number_of_vehicles, velocities, rows, cols)
+
+  return (velocities, plane_velocities)
+
+def calculate_plane_velocities(number_of_vehicles, velocities, rows, cols) :
+  """ Повертає швидкості в одновимірному масиві """
   plane_velocities = np.zeros(number_of_vehicles)
   index = 0
 
@@ -47,7 +53,7 @@ def calculate_velocities(vehicle_distances, time_step) :
         plane_velocities[index] = velocities[i][j]
         index += 1
 
-  return [velocities, plane_velocities]
+  return plane_velocities
 
 def calculate_mean_velocities(velocities) :
   """ Обчислює середні значення швидкостей в кожен даний момент часу """
