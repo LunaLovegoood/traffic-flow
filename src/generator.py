@@ -1,6 +1,29 @@
+# Traffic flow
+#
+# Copyright (c) 2018 Yurii Khomiak
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
 import numpy as np
 
 def generate_time_stamps(number_of_time_stamps, time_step) :
+  """ Генерує значення табульованих часових відліків """
   if number_of_time_stamps <= 0 or time_step <= 0 :
     return np.array([])
   time_stamps = np.arange(0, number_of_time_stamps * time_step, time_step)
@@ -11,6 +34,7 @@ def generate_distances(
     road_interval, time_stamps, 
     mean_speed, speed_deviation,
     average_number_of_vehicles) :
+  """ Генерує відстані, які пройшли авто за кожен часовий інтервал """
   number_of_time_stamps = time_stamps.size
   time_step = time_stamps[1] - time_stamps[0]
   mean_speed *= time_step
@@ -32,8 +56,7 @@ def generate_distances(
     for j in range(0, first_unexistent_vehicle_index) :
       if positions[j] == road_interval :
         continue
-      gamma_shift = np.random.gamma(9, 0.5) - 2.0
-      distances[j][i] = np.random.normal(mean_speed, speed_deviation) + gamma_shift - shift
+      distances[j][i] = calculate_velocity_shift(mean_speed, speed_deviation, shift)
       if distances[j][i] < 0 :
         distances[j][i] = 0
       if (positions[j] + distances[j][i]) <= road_interval :
@@ -44,8 +67,23 @@ def generate_distances(
 
   return [distances, positions, starting_positions]
 
+def calculate_velocity_shift(mean_speed, speed_deviation, shift) :
+  """ Повертає відстань, яку проїде авто за одиницю часу """
+  gamma_shift = np.random.gamma(9, 0.5) - 2.0
+  velocity_shift = np.random.normal(mean_speed, speed_deviation) + gamma_shift - shift
+
+  if velocity_shift < 0.5*mean_speed :
+    velocity_shift -= 0.3*np.random.gamma(9, 0.5)
+  elif velocity_shift < mean_speed :
+    velocity_shift -= 0.1*np.random.gamma(9, 0.5)
+  else :
+    velocity_shift -= 0.2*np.random.gamma(9, 0.5)
+
+  return velocity_shift
+
 def generate_starting_positions(number_of_vehicles, average_number_of_vehicles,
     vehicle_length, road_interval, number_of_lanes) :
+  """ Генерує початкові позиції автомобілів """
   starting_positions = np.zeros(number_of_vehicles)
   mean_spacing = ((road_interval*number_of_lanes) - (vehicle_length*average_number_of_vehicles)) / average_number_of_vehicles
 
@@ -75,6 +113,7 @@ def generate_starting_positions(number_of_vehicles, average_number_of_vehicles,
   return starting_positions
 
 def find_first_unexistent_vehicle(starting_positions) :
+  """ Знаходить останній автомобіль, який знаходиться в даному інтервалі дороги """
   vehicle_index = 0
 
   while vehicle_index < starting_positions.size :
@@ -86,6 +125,7 @@ def find_first_unexistent_vehicle(starting_positions) :
   return vehicle_index
 
 def generate_tabled_density_values(max_density) :
+  """ Генерує табульовані значення густина для фундаментальної діаграми """
   step = 0.001
   return np.arange(0, max_density + step, step)
 
