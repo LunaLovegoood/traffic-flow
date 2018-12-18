@@ -43,3 +43,35 @@ def print_mean_values(mean_velocity, mean_density, mean_flow_rate) :
   print('Середнє значення швидкості <v> = ', conv.m_per_sec_to_km_per_h(mean_velocity), ' (км/год)')
   print('Середнє значення густини <густина> = ', mean_density)
   print('Середнє значення потоку <f> = ', mean_flow_rate, ' (авто/с)', end='\n\n')
+
+def print_stats(
+    sorted_velocity_values,
+    centers_of_intervals, quantities_of_velocities_per_interval, densities_for_histogram,
+    mean, variance, deviation,
+    density_values, interval_probabilities,
+    is_normal_by_pearson, calculated_chi_value, critical_chi_value,
+    confidence_interval, deviation_of_estimation) :
+  print('Розмір вибірки: ', sorted_velocity_values.size)
+  print('Відсортовані значеня швидкості:\n',sorted_velocity_values, end='\n\n')
+
+  print('Центри інтервалів: ', centers_of_intervals)
+  print('Ксть значень швидкості у кожному інтервалі: ', quantities_of_velocities_per_interval)
+  print('Шільності для побудови гістограми: ', densities_for_histogram, end='\n\n')
+
+  print('Математичне сподівання швидкості: ', mean, ' (км/год)')
+  print('Дисперсія: ', variance)
+  print('Середнє квадратичне відхилення: ', deviation, end='\n\n')
+
+  print('Значення щільності: ', density_values)
+  print('Ймовірності швидкості по інтервалах: ', interval_probabilities, end='\n\n')
+
+  if is_normal_by_pearson :
+    print('Гіпотеза про нормальний розподіл генеральної сукупності, згідно з критерієм Пірсона, підтверджена')
+  else :
+    print('Гіпотеза про нормальний розподіл генеральної сукупності, згідно з критерієм Пірсона, не підтверджена')
+  print('Розрахунове хі-квадрат: ', calculated_chi_value)
+  print('Табличне хі-квадрат: ', critical_chi_value, end='\n\n')
+
+  print('Середньоквадратичне відхилення оцінки: ', deviation_of_estimation)
+  print('Довірчий інтервал: ', confidence_interval, end='\n\n')
+  

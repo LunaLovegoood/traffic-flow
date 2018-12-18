@@ -97,9 +97,6 @@ is_normal_by_pearson, calculated_chi_value, critical_chi_value = statistics_anal
     significance_level, number_of_paramaters
   )
 confidence_interval, deviation_of_estimation = statistics_analysis.get_confidence_interval(mean, variance, sorted_velocity_values.size)
-print(is_normal_by_pearson)
-print(confidence_interval)
-print(deviation_of_estimation)
 
 #
 # Виведення результатів
@@ -108,6 +105,14 @@ print(deviation_of_estimation)
 out_mng.print_basic_constants(road_interval, number_of_lanes, number_of_vehicles, number_of_time_stamps)
 out_mng.print_max_values(max_velocity, max_density, max_flow_rate)
 out_mng.print_mean_values(mean_velocity, mean_density, mean_flow_rate)
+out_mng.print_stats(
+    sorted_velocity_values,
+    centers_of_intervals, quantities_of_velocities_per_interval, densities_for_histogram,
+    mean, variance, deviation,
+    density_values, interval_probabilities,
+    is_normal_by_pearson, calculated_chi_value, critical_chi_value,
+    confidence_interval, deviation_of_estimation
+  )
 
 #
 # Створення та виведення графіків
