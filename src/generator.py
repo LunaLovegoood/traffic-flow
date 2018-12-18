@@ -23,6 +23,7 @@
 import numpy as np
 
 def generate_time_stamps(number_of_time_stamps, time_step) :
+  """ Генерує значення табульованих часових відліків """
   if number_of_time_stamps <= 0 or time_step <= 0 :
     return np.array([])
   time_stamps = np.arange(0, number_of_time_stamps * time_step, time_step)
@@ -33,6 +34,7 @@ def generate_distances(
     road_interval, time_stamps, 
     mean_speed, speed_deviation,
     average_number_of_vehicles) :
+  """ Генерує відстані, які пройшли авто за кожен часовий інтервал """
   number_of_time_stamps = time_stamps.size
   time_step = time_stamps[1] - time_stamps[0]
   mean_speed *= time_step
@@ -68,6 +70,7 @@ def generate_distances(
 
 def generate_starting_positions(number_of_vehicles, average_number_of_vehicles,
     vehicle_length, road_interval, number_of_lanes) :
+  """ Генерує початкові позиції автомобілів """
   starting_positions = np.zeros(number_of_vehicles)
   mean_spacing = ((road_interval*number_of_lanes) - (vehicle_length*average_number_of_vehicles)) / average_number_of_vehicles
 
@@ -97,6 +100,7 @@ def generate_starting_positions(number_of_vehicles, average_number_of_vehicles,
   return starting_positions
 
 def find_first_unexistent_vehicle(starting_positions) :
+  """ Знаходить останній автомобіль, який знаходиться в даному інтервалі дороги """
   vehicle_index = 0
 
   while vehicle_index < starting_positions.size :
@@ -108,6 +112,7 @@ def find_first_unexistent_vehicle(starting_positions) :
   return vehicle_index
 
 def generate_tabled_density_values(max_density) :
+  """ Генерує табульовані значення густина для фундаментальної діаграми """
   step = 0.001
   return np.arange(0, max_density + step, step)
 

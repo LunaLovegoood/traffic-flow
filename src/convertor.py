@@ -23,24 +23,31 @@
 import numpy as np
 
 def km_per_h_to_m_per_sec(speed) :
+  """ Переводить (км/год) в (м/с) """
   return speed * (1000 / 3600)
 
 def m_per_sec_to_km_per_h(speed) :
+  """ Переводить (м/с) в (км/год) """
   return speed * 3.6
 
 def km_to_m(distance) :
+  """ Переводить (км) в (м) """
   return distance * 1000
 
 def m_to_km(distance) :
+  """ Переводить (м) в (км) """
   return distance / 1000
 
 def h_to_s(time) :
+  """ Переводить (год) в (с) """
   return time / 3600
 
 def s_to_h(time) :
+  """ Переводить (с) в (год) """
   return time * 3600
 
 def plane_velocities_to_km_per_h(plane_velocities) :
+  """ Переводить масив швидкостей з (м/с) в (км/год) """
   converted_velocities = np.zeros(plane_velocities.size)
 
   for i in range(0, plane_velocities.size) :
